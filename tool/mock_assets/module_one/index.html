@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Module One</title>
+    <link rel="stylesheet" href="/common/style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div id="view-main">
+        <div class="web-identity-banner">
+          <span class="web-badge">🌐 H5 离线单页 (Web Payload View)</span>
+          <span>协议: Localhost HTTP · 0 远程延迟</span>
+        </div>
+        <h1>Module One</h1>
+        <p>混合开发离线包与 JSBridge 演示</p>
+
+        <div class="demo-actions">
+          <button id="btn-echo" type="button">Echo 消息</button>
+          <button id="btn-info" type="button">宿主环境信息</button>
+          <button id="btn-toast" type="button">原生 Toast</button>
+          <button id="btn-modal" type="button" style="background:#e67e22">呼起原生弹窗 (验证iOS手势)</button>
+          <button id="btn-enter-sub" type="button" style="background:#27ae60">进入 SPA 二级路由 (测试返回键)</button>
+        </div>
+
+        <div class="order-card" id="order-card">
+          <div class="order-title">业务场景：模拟支付与外部跳转测试</div>
+          <div>商品：Flutter 离线包容器高级授权</div>
+          <div>金额：<strong>¥99.00</strong></div>
+          <div class="order-status" id="order-status">订单状态：待支付</div>
+        </div>
+
+        <div class="demo-actions">
+          <button id="btn-pay-apple" type="button" style="background:#000000">Apple Pay (应用内原生半屏)</button>
+          <button id="btn-pay-alipay" type="button" style="background:#1677ff">支付宝支付 (跳外部App+SDK返回)</button>
+          <button id="btn-pay-wechat" type="button" style="background:#07c160">微信支付 (跳外部App+异步事件通知)</button>
+        </div>
+      </div>
+
+      <div id="view-sub" style="display: none;">
+        <h2 style="color:#27ae60">H5 SPA 二级页面</h2>
+        <p style="font-size:14px; color:#555;">
+          当前处于 H5 内部路由状态。此时按下 Android 物理返回键或调用返回，
+          将优先被 <code>window.__tryGoBack()</code> 拦截并退回到上一级，<strong>不会直接关闭 Flutter 原生页面</strong>。
+        </p>
+        <div class="demo-actions">
+          <button id="btn-back-main" type="button" style="background:#7f8c8d">手动返回一级页面</button>
+          <button id="btn-sub-action" type="button">子页面交互</button>
+        </div>
+      </div>
+
+      <pre id="bridge-output" class="bridge-output">Bridge: waiting...</pre>
+    </div>
+    <script src="/common/bridge-demo.js"></script>
+  </body>
+</html>

@@ -1,0 +1,128 @@
+name: Deploy Web Payload to GitHub Pages
+
+# 按需手动触发，生成与包内 version.json 完全一致的演示离线包并发布到 GitHub Pages。
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Payload semantic version (e.g. 1.1.0)'
+        required: false
+        default: '1.1.0'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: 'pages'
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Package web modules and generate aligned version manifests
+        env:
+          PAYLOAD_VERSION: ${{ github.event.inputs.version || '1.1.0' }}
+        run: |
+          python3 - <<'PY'
+          import hashlib, json, os, shutil, time, zipfile
+
+          version_str = os.environ.get("PAYLOAD_VERSION", "1.1.0").strip() or "1.1.0"
+          src_dir = "example/assets/web_modules"
+          stage_dir = "build/pages_stage"
+          dist_dir = "dist"
+          bundles_dir = os.path.join(dist_dir, "bundles")
+
+          shutil.rmtree(stage_dir, ignore_errors=True)
+          shutil.rmtree(dist_dir, ignore_errors=True)
+          shutil.copytree(src_dir, stage_dir)
+          os.makedirs(bundles_dir, exist_ok=True)
+
+          # 读取原模块元数据并重新计算所有静态文件 MD5，确保与压缩包完全一致
+          manifest_path = os.path.join(stage_dir, "version.json")
+          with open(manifest_path, "r", encoding="utf-8") as f:
+              inner = json.load(f)
+
+          files = []
+          for root, _, filenames in os.walk(stage_dir):
+              for fn in sorted(filenames):
+                  full = os.path.join(root, fn)
+                  rel = os.path.relpath(full, stage_dir).replace(os.sep, "/")
+                  if rel == "version.json":
+                      continue
+                  with open(full, "rb") as rf:
+                      digest = hashlib.md5(rf.read()).hexdigest()
+                  files.append({"path": rel, "md5": digest})
+
+          files.sort(key=lambda x: x["path"])
+          inner["version"] = version_str
+          inner["versionStr"] = version_str
+          inner["buildLabel"] = f"v{version_str}-gh-pages"
+          inner["fileInfo"] = {"total_files": len(files), "files": files}
+          for mod in inner.get("modules", []):
+              mod["version"] = version_str
+
+          with open(manifest_path, "w", encoding="utf-8") as f:
+              json.dump(inner, f, ensure_ascii=False, indent=2)
+
+          zip_path = os.path.join(bundles_dir, "web_modules.zip")
+          with zipfile.ZipFile(zip_path, "w", compression=zipfile.ZIP_DEFLATED) as zf:
+              for root, _, filenames in os.walk(stage_dir):
+                  for fn in sorted(filenames):
+                      full = os.path.join(root, fn)
+                      arcname = os.path.relpath(full, stage_dir).replace(os.sep, "/")
+                      zf.write(full, arcname)
+
+          with open(zip_path, "rb") as f:
+              zip_bytes = f.read()
+          zip_md5 = hashlib.md5(zip_bytes).hexdigest()
+          zip_size = len(zip_bytes)
+          timestamp = int(time.time() * 1000)
+
+          remote_manifest = {
+              "version": version_str,
+              "versionStr": version_str,
+              "downloadUrl": "https://jixiaoyong.github.io/web_payload_manager/bundles/web_modules.zip",
+              "zipUrl": "https://jixiaoyong.github.io/web_payload_manager/bundles/web_modules.zip",
+              "md5": zip_md5,
+              "timestamp": timestamp,
+              "fileSize": zip_size,
+              "buildLabel": f"v{version_str}-gh-pages",
+              "description": "Hosted demo payload bundle deployed via GitHub Actions",
+          }
+
+          with open(os.path.join(dist_dir, "version.json"), "w", encoding="utf-8") as f:
+              json.dump(remote_manifest, f, ensure_ascii=False, indent=2)
+
+          landing_src = "site/index.html"
+          if not os.path.isfile(landing_src):
+              raise FileNotFoundError(f"Landing page not found: {landing_src}")
+          shutil.copyfile(landing_src, os.path.join(dist_dir, "index.html"))
+
+          print(json.dumps(remote_manifest, ensure_ascii=False, indent=2))
+          PY
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: 'dist'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

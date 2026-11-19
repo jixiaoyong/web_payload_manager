@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f5f7fb" />
+    <meta name="description" content="web_payload_manager：面向 Flutter WebView 的离线 Web 资源管理、版本更新与本地托管工具包。" />
+    <title>web_payload_manager — Flutter 离线 Web 资源管理</title>
+    <style>
+    :root { color-scheme: light; --ink: #172033; --muted: #65718a; --blue: #4568e8; --line: #e4e9f2; --page: #f5f7fb; --surface: #fff; --hero-start: #fff; --hero-end: #f8faff; --hero-glow: #dfe7ff; --detail: #7c879b; }
+      :root[data-theme="dark"] { color-scheme: dark; --ink: #e7ecf7; --muted: #a5b0c5; --blue: #91a7ff; --line: #30394b; --page: #111722; --surface: #1a2331; --hero-start: #1d2738; --hero-end: #151d2a; --hero-glow: #35466f; --detail: #8d9ab1; }
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) { color-scheme: dark; --ink: #e7ecf7; --muted: #a5b0c5; --blue: #91a7ff; --line: #30394b; --page: #111722; --surface: #1a2331; --hero-start: #1d2738; --hero-end: #151d2a; --hero-glow: #35466f; --detail: #8d9ab1; }
+      }
+      @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) body { background: var(--page); } }
+      :root[data-theme="dark"] body { background: var(--page); }
+      :root[data-theme="dark"] .hero { background: radial-gradient(ellipse at 85% 10%, var(--hero-glow) 0, transparent 38%), linear-gradient(135deg, var(--hero-start), var(--hero-end)); }
+      :root[data-theme="dark"] .button, :root[data-theme="dark"] .card { background: var(--surface); }
+      :root[data-theme="dark"] .step .detail { color: var(--detail); }
+      @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .hero { background: radial-gradient(ellipse at 85% 10%, var(--hero-glow) 0, transparent 38%), linear-gradient(135deg, var(--hero-start), var(--hero-end)); } :root:not([data-theme="light"]) .button, :root:not([data-theme="light"]) .card { background: var(--surface); } :root:not([data-theme="light"]) .step .detail { color: var(--detail); } }
+      * { box-sizing: border-box; }
+      body { margin: 0; color: var(--ink); background: var(--page); font: 16px/1.65 Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      a { color: inherit; }
+      .wrap { width: min(1080px, calc(100% - 40px)); margin: auto; }
+      header { display: flex; justify-content: space-between; align-items: center; padding: 25px 0; }
+      .brand { font-weight: 750; letter-spacing: -.03em; text-decoration: none; }
+      .header-controls { display: flex; align-items: center; }
+      .preferences { display: flex; gap: 8px; }
+      .preferences label { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+      .preferences select { min-height: 38px; max-width: 150px; padding: 0 32px 0 12px; appearance: none; -webkit-appearance: none; border: 1px solid var(--line); border-radius: 11px; color: var(--ink); background-color: var(--surface); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='m1 1 5 5 5-5' fill='none' stroke='%2365718a' stroke-width='1.5'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; box-shadow: 0 2px 6px #1720330a; font: inherit; font-size: 13px; cursor: pointer; }
+      :root[data-theme="dark"] .preferences select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='m1 1 5 5 5-5' fill='none' stroke='%23a5b0c5' stroke-width='1.5'/%3E%3C/svg%3E"); box-shadow: 0 2px 8px #0003; }
+      @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .preferences select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='m1 1 5 5 5-5' fill='none' stroke='%23a5b0c5' stroke-width='1.5'/%3E%3C/svg%3E"); box-shadow: 0 2px 8px #0003; } }
+      .preferences select:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+      .preferences option { color: var(--ink); background: var(--surface); }
+      .hero { position: relative; overflow: hidden; margin: 36px 0 68px; padding: clamp(38px, 7vw, 76px); border: 1px solid var(--line); border-radius: 28px; background: radial-gradient(ellipse at 85% 10%, var(--hero-glow) 0, transparent 38%), linear-gradient(135deg, var(--hero-start), var(--hero-end)); }
+      .eyebrow { color: var(--blue); font-weight: 700; font-size: 13px; letter-spacing: .12em; text-transform: uppercase; }
+      h1 { max-width: 760px; margin: 14px 0 18px; font-size: clamp(38px, 7vw, 68px); line-height: 1.08; letter-spacing: -.055em; }
+      .lead { max-width: 690px; margin: 0; color: var(--muted); font-size: 18px; }
+      .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
+      .button { display: inline-flex; align-items: center; justify-content: center; min-height: 46px; padding: 0 19px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); font-weight: 650; text-decoration: none; }
+      .button.primary { color: white; background: var(--blue); border-color: var(--blue); box-shadow: 0 8px 20px #4568e833; }
+      section { margin: 0 0 68px; }
+      .section-title { margin: 0 0 8px; font-size: 27px; letter-spacing: -.03em; }
+      .section-lead { margin: 0 0 23px; color: var(--muted); }
+      .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+      .card { padding: 22px; border: 1px solid var(--line); border-radius: 17px; background: var(--surface); }
+      .card .icon { color: var(--blue); font-size: 20px; font-weight: 750; }
+      .card h3 { margin: 10px 0 5px; font-size: 17px; }
+      .card p { margin: 0; color: var(--muted); font-size: 14px; }
+      .flow { display: grid; gap: 0; }
+      .step { display: grid; grid-template-columns: 78px minmax(0, 1fr); gap: 12px; padding: 21px 18px; border-bottom: 1px solid var(--line); }
+      .step:first-child { border-top: 1px solid var(--line); }
+      .number { color: var(--blue); font-size: 22px; font-weight: 750; letter-spacing: -.04em; }
+      .step h3 { margin: 0 0 4px; font-size: 17px; }
+      .step p { max-width: 760px; margin: 0; color: var(--muted); font-size: 14px; }
+      .step .detail { margin-top: 7px; color: var(--detail); font-size: 13px; }
+      footer { display: flex; justify-content: space-between; gap: 18px; padding: 23px 0 35px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+      footer div { display: flex; flex-wrap: wrap; gap: 16px; }
+      footer a { text-decoration: none; }
+      .en { display: none; }
+      html[lang="en"] .zh { display: none; }
+      html[lang="en"] .en { display: initial; }
+      @media (max-width: 720px) { header { align-items: stretch; gap: 14px; flex-direction: column; } .header-controls { align-items: flex-start; justify-content: flex-end; gap: 12px; flex-wrap: wrap; } .preferences { flex-wrap: wrap; } .preferences select { max-width: 135px; } .hero { margin: 18px 0 50px; border-radius: 20px; } .grid { grid-template-columns: 1fr; } .step { grid-template-columns: 52px minmax(0, 1fr); padding-inline: 4px; } footer { flex-direction: column; } }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <a class="brand" href="#top">web_payload_manager</a>
+        <div class="header-controls"><div class="preferences"><label for="language-select"><span class="zh">语言</span><span class="en">Language</span></label><select id="language-select" aria-label="语言 / Language"><option value="zh-CN">简体中文</option><option value="en">English</option></select><label for="theme-select"><span class="zh">主题</span><span class="en">Theme</span></label><select id="theme-select" aria-label="主题 / Theme"><option value="system" data-zh="跟随系统" data-en="System">跟随系统</option><option value="light" data-zh="亮色" data-en="Light">亮色</option><option value="dark" data-zh="暗色" data-en="Dark">暗色</option></select></div></div>
+      </header>
+      <main id="top">
+        <section class="hero">
+          <div class="eyebrow">Flutter · Offline Web Payloads</div>
+          <h1><span class="zh">Flutter App 内的 Web 内容热更新管理方案</span><span class="en">Hot-update management for web content in Flutter apps</span></h1>
+          <p class="lead"><span class="zh">让 Flutter App 的 Web 内容离线可用、更新可控，嵌入式 WebView 管理版本化资源：优先加载本地内容，在后台检查更新，并在安全时机切换到已验证的新版本。比小程序方案更轻量；相比在线加载 H5，加载更快，不惧弱网。</span><span class="en">Keep web content in Flutter apps available offline and updates under control. Manage versioned assets in an embedded WebView: load local content first, check for updates in the background, and switch to a verified new version at a safe time. Lighter than a mini-program approach; faster to load than online H5, and resilient to weak networks.</span></p>
+          <div class="actions"><a class="button primary" href="https://github.com/jixiaoyong/web_payload_manager"><span class="zh">查看 GitHub 项目 ↗</span><span class="en">View on GitHub ↗</span></a><a class="button" href="#workflow"><span class="zh">了解更新原理 ↓</span><span class="en">How updates work ↓</span></a></div>
+        </section>
+        <section id="features">
+          <h2 class="section-title"><span class="zh">面向真实集成场景</span><span class="en">Built for real-world integrations</span></h2>
+          <p class="section-lead"><span class="zh">把资源下载、校验、存储和本地加载整合到 Flutter 应用中。</span><span class="en">Bring asset downloads, validation, storage, and local serving together in your Flutter app.</span></p>
+          <div class="grid">
+            <article class="card"><div class="icon">01</div><h3><span class="zh">本地优先，后台更新</span><span class="en">Local-first, background updates</span></h3><p><span class="zh">从内置或已验证资源启动页面；更新在后台准备，不打断当前模块会话。</span><span class="en">Launch from bundled or verified assets. Updates prepare in the background without interrupting the current module session.</span></p></article>
+            <article class="card"><div class="icon">02</div><h3><span class="zh">安全下载与校验</span><span class="en">Secure downloads and validation</span></h3><p><span class="zh">支持 ZIP 资源包、断点续传、文件完整性校验，以及安全路径和解压限制。</span><span class="en">Supports ZIP asset bundles, resumable downloads, file integrity checks, and safe path and extraction limits.</span></p></article>
+            <article class="card"><div class="icon">03</div><h3><span class="zh">通过本地 HTTP 加载</span><span class="en">Serve over local HTTP</span></h3><p><span class="zh">使用回环地址为 WebView 提供本地资源，并可按模块管理资源版本与入口。</span><span class="en">Serve local assets to WebViews over a loopback address, with per-module asset versions and entry points.</span></p></article>
+          </div>
+        </section>
+        <section id="workflow">
+          <h2 class="section-title"><span class="zh">一次更新是怎样完成的</span><span class="en">How an update works</span></h2>
+          <p class="section-lead"><span class="zh">远端只提供版本清单和静态资源包；下载、验证、安装与切换由宿主 App 中的 Flutter 包管理。</span><span class="en">The remote host provides only a version manifest and static asset bundles; the Flutter package in the host app manages downloading, validation, installation, and activation.</span></p>
+          <div class="flow">
+            <article class="step"><div class="number">01</div><div><h3><span class="zh">检查远端版本清单</span><span class="en">Check the remote version manifest</span></h3><p><span class="zh">应用启动或业务触发检查时，组件请求开发者配置的 <code>version.json</code> 或更新 API。清单描述最新版本、ZIP 地址、包校验值，以及可选的最低宿主版本和强制更新信息。</span><span class="en">When the app starts or the host triggers a check, the package requests the developer-configured <code>version.json</code> or update API. The manifest describes the latest version, ZIP URL, package checksum, and optional minimum host version and mandatory-update information.</span></p><p class="detail"><span class="zh">若本地版本已是最新、网络不可用或处于纯内置模式，可以继续使用当前可用资源；更新不要求 Web 页面先从网络加载。</span><span class="en">If the local version is current, the network is unavailable, or the app is using bundled assets only, the available assets remain usable. Updates do not require the web page to load from the network first.</span></p></div></article>
+            <article class="step"><div class="number">02</div><div><h3><span class="zh">下载资源包到暂存区</span><span class="en">Download the asset bundle to staging</span></h3><p><span class="zh">发现新版本后，组件将 ZIP 下载到应用沙盒的临时位置。下载过程支持进度回调与断点恢复，避免网络中断后必须从头开始。</span><span class="en">When a newer version is found, the package downloads the ZIP to a temporary location in the app sandbox. Progress callbacks and resume support avoid restarting from scratch after a network interruption.</span></p><p class="detail"><span class="zh">清单和下载地址由业务服务或静态托管提供；GitHub Pages 在本项目中只是一个公开演示更新源的例子。</span><span class="en">The application service or static hosting provides the manifest and download URL. GitHub Pages is only an example of a public demo update source in this project.</span></p></div></article>
+            <article class="step"><div class="number">03</div><div><h3><span class="zh">验证内容并安全安装</span><span class="en">Verify content and install safely</span></h3><p><span class="zh">安装前检查包完整性与清单中的文件校验信息，再校验 ZIP 条目路径和解压规模，拒绝路径穿越、不允许的文件类型或超出限制的内容。</span><span class="en">Before installation, the package checks bundle integrity and manifest file checksums, then validates ZIP entry paths and extraction size. It rejects path traversal, disallowed file types, and content exceeding configured limits.</span></p><p class="detail"><span class="zh">只有验证成功的文件才会进入应用管理的版本目录；失败的下载或解压不会替换当前可用版本。</span><span class="en">Only verified files enter the app-managed version directory. A failed download or extraction never replaces the currently available version.</span></p></div></article>
+            <article class="step"><div class="number">04</div><div><h3><span class="zh">继续使用当前会话，择机切换</span><span class="en">Keep the current session; switch at a safe point</span></h3><p><span class="zh">组件通过本机回环 HTTP 服务把已安装模块提供给 WebView。当前页面使用不可变的资源快照；新包准备好后，宿主可在页面重开等安全边界激活新版本。</span><span class="en">The package serves installed modules to the WebView over a local loopback HTTP server. The current page uses an immutable asset snapshot; once a new bundle is ready, the host can activate it at a safe boundary, such as when reopening the page.</span></p><p class="detail"><span class="zh">这样可避免资源更新过程中同一个页面混用新旧文件，也让应用掌握何时切换，而不是强制打断用户。</span><span class="en">This prevents a page from mixing old and new files during an update and lets the app choose when to switch, rather than interrupting the user.</span></p></div></article>
+          </div>
+        </section>
+      </main>
+      <footer><span id="copyright"><span class="zh">© 2025–<span class="copyright-year"></span> jixiaoyong · MIT License</span><span class="en">© 2025–<span class="copyright-year"></span> jixiaoyong · MIT License</span></span><div><a href="https://github.com/jixiaoyong/web_payload_manager/blob/master/README.md">README</a><a href="https://github.com/jixiaoyong/web_payload_manager/blob/master/doc/integration.zh-CN.md"><span class="zh">集成指南</span><span class="en">Integration guide</span></a></div></footer>
+    </div>
+    <script>
+      (() => {
+        const root = document.documentElement;
+        const languageSelect = document.querySelector("#language-select");
+        const themeSelect = document.querySelector("#theme-select");
+        const isChinese = /^(zh|zh[-_])/i.test(navigator.language || "");
+        const storedLanguage = localStorage.getItem("wpm-language");
+        const storedTheme = localStorage.getItem("wpm-theme");
+        const language = ["zh-CN", "en"].includes(storedLanguage) ? storedLanguage : (isChinese ? "zh-CN" : "en");
+        const theme = ["system", "light", "dark"].includes(storedTheme) ? storedTheme : "system";
+        const currentYear = new Date().getFullYear();
+        if (Number.isFinite(currentYear)) {
+          document.querySelectorAll(".copyright-year").forEach((element) => {
+            element.textContent = String(currentYear);
+          });
+        }
+
+        function applyLanguage(value) {
+          root.lang = value;
+          languageSelect.value = value;
+          themeSelect.querySelectorAll("option").forEach((option) => {
+            option.textContent = option.dataset[value === "en" ? "en" : "zh"];
+          });
+          document.title = value === "en" ? "web_payload_manager — Offline Web Assets for Flutter" : "web_payload_manager — Flutter 离线 Web 资源管理";
+          document.querySelector('meta[name="description"]').content = value === "en"
+            ? "web_payload_manager: an offline web asset management and versioning toolkit for Flutter WebViews."
+            : "web_payload_manager：面向 Flutter WebView 的离线 Web 资源管理、版本更新与本地托管工具包。";
+        }
+
+        function applyTheme(value) {
+          themeSelect.value = value;
+          if (value === "system") root.removeAttribute("data-theme");
+          else root.dataset.theme = value;
+        }
+
+        applyLanguage(language);
+        applyTheme(theme);
+        languageSelect.addEventListener("change", () => {
+          applyLanguage(languageSelect.value);
+          localStorage.setItem("wpm-language", languageSelect.value);
+        });
+        themeSelect.addEventListener("change", () => {
+          applyTheme(themeSelect.value);
+          localStorage.setItem("wpm-theme", themeSelect.value);
+        });
+      })();
+    </script>
+  </body>
+</html>

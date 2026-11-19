@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "buildLabel": "2026-11-14 v1.0.0",
+  "fileInfo": {
+    "total_files": 4,
+    "files": [
+      {
+        "path": "common/style.css",
+        "md5": "e3298eaee62f254f6676024160dd8dd1"
+      },
+      {
+        "path": "common/bridge-demo.js",
+        "md5": "2a13dd197c650c9d097edeb40a5bcfae"
+      },
+      {
+        "path": "module_one/index.html",
+        "md5": "3aa3f2947c01b4f7780c6c66fa279f4f"
+      },
+      {
+        "path": "module_two/index.html",
+        "md5": "0366be83ecccda9b31f039d743ed9744"
+      }
+    ]
+  },
+  "modules": [
+    {
+      "name": "Module One",
+      "key": "module_one",
+      "entryHtml": "module_one/index.html",
+      "version": 1,
+      "description": "Hybrid container with JSBridge, SPA router back negotiation, modal gesture validation, and 3 payment simulation flows."
+    },
+    {
+      "name": "Module Two",
+      "key": "module_two",
+      "entryHtml": "module_two/index.html",
+      "version": 1,
+      "description": "Second static web module."
+    }
+  ]
+}

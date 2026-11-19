@@ -1,0 +1,27 @@
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+subprojects { project ->
+    if (project.name == "flutter_inappwebview_android") {
+        def bgFile = project.file("build.gradle")
+        if (bgFile.exists() && bgFile.text.contains("proguard-android.txt")) {
+            bgFile.text = bgFile.text.replace("proguard-android.txt", "proguard-android-optimize.txt")
+        }
+    }
+}
+
+rootProject.buildDir = "../build"
+subprojects {
+    project.buildDir = "${rootProject.buildDir}/${project.name}"
+}
+subprojects {
+    project.evaluationDependsOn(":app")
+}
+
+tasks.register("clean", Delete) {
+    delete rootProject.buildDir
+}

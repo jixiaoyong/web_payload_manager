@@ -1,0 +1,28 @@
+# Local dev, CI, and mock server tooling (not part of published package)
+.github/
+.fvm/
+.fvmrc
+tool/
+coverage/
+build/
+.dart_tool/
+.idea/
+.vscode/
+.DS_Store
+*.iml
+.metadata
+pubspec.lock
+
+# Example local build artifacts & lockfiles
+example/.dart_tool/
+example/build/
+example/ios/Pods/
+example/ios/.symlinks/
+example/android/.gradle/
+example/.flutter-plugins
+example/.flutter-plugins-dependencies
+example/pubspec.lock
+**/local.properties
+**/*.init.gradle
+**/*.keystore
+**/*.jks

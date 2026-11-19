@@ -1,0 +1,17 @@
+name: web_payload_tool
+description: Local mock update server for web_payload_manager development.
+publish_to: none
+
+environment:
+  sdk: ">=3.4.0 <4.0.0"
+
+dependencies:
+  archive: ^4.7.1
+  crypto: ^3.0.5
+  path: ^1.9.0
+  shelf: ^1.4.1
+  shelf_router: ^1.1.4
+  shelf_static: ^1.1.2
+
+dev_dependencies:
+  test: ^1.25.0

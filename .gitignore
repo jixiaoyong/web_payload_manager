@@ -1,0 +1,38 @@
+.DS_Store
+.fvm/
+.dart_tool/
+build/
+.idea/
+.vscode/
+*.iml
+
+# Flutter
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub/
+/pubspec.lock
+
+# Local / generated
+.metadata
+**/local.properties
+**/*.init.gradle
+**/*.keystore
+**/*.jks
+android/local.properties
+ios/Pods/
+ios/.symlinks/
+example/.dart_tool/
+example/build/
+example/ios/Pods/
+example/ios/.symlinks/
+example/android/.gradle/
+example/.flutter-plugins
+example/.flutter-plugins-dependencies
+
+# Test output
+coverage/
+
+# Tool output
+tool/dist/
+tool/.dart_tool/

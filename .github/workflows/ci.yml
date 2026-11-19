@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [ master, main, dev ]
+  pull_request:
+    branches: [ master, main, dev ]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Print Flutter Version
+        run: flutter --version
+
+      - name: Install dependencies (Root Package)
+        run: flutter pub get
+
+      - name: Check formatting
+        run: dart format --output=none --set-exit-if-changed lib/ test/ example/lib/ example/test/
+
+      - name: Analyze Root Package
+        run: flutter analyze --no-fatal-infos
+
+      - name: Run Root Package Unit Tests
+        run: flutter test --coverage
+
+      - name: Install dependencies (Example)
+        run: |
+          cd example
+          flutter pub get
+
+      - name: Analyze Example
+        run: |
+          cd example
+          flutter analyze --no-fatal-infos
+
+      - name: Run Example Widget Tests
+        run: |
+          cd example
+          flutter test
+
+      - name: Run Mock Tool Tests
+        run: |
+          cd tool
+          dart pub get
+          dart test
